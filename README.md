@@ -8,7 +8,7 @@
   <a href="https://github.com/ambv/black">
     <img src="https://img.shields.io/badge/code%20style-black-000000.svg">
     </a>
-
+  <img src="https://github.com/TurnrDev/TurnrCogs/workflows/Lint%20&%20Style%20Check/badge.svg">
 </p>
 
 # Contact
