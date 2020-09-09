@@ -1,0 +1,12 @@
+{
+  "author": [
+    "TurnrDev"
+  ],
+  "description": "Create, edit and close your GitHub issues",
+  "short": "Create, edit and close your GitHub issues",
+  "min_bot_version": "3.4.0",
+  "tags": [
+    "GitHub"
+  ],
+  "name": "GitHub Issue Manager"
+}
