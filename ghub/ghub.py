@@ -68,7 +68,7 @@ class GitHub(commands.Cog):
             __repo = await self.config.repo()
             try:
                 repo = self.github.get_repo(__repo)
-            except github.GithubException.UnknownObjectException:
+            except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]githubset repo`"
                 )
@@ -76,12 +76,12 @@ class GitHub(commands.Cog):
             __issue = issue
             try:
                 issue = repo.get_issue(number=__issue)
-            except github.GithubException.UnknownObjectException:
+            except github.GithubException:
                 await ctx.send("Issue not found.")
                 return
             embed: discord.Embed = discord.Embed(
-                title=f"{issue.title} (#{issue.number})",
-                description=issue.body,
+                title=cf.escape(f"{issue.title} (#{issue.number})", mass_mentions=True),
+                description=cf.escape(issue.body, mass_mentions=True),
                 url=issue.html_url,
                 timestamp=issue.updated_at,
                 colour=(
@@ -91,7 +91,7 @@ class GitHub(commands.Cog):
                 ),
             )
             embed.set_author(
-                name=f"{issue.user.login} ({issue.user.name})",
+                name=cf.escape(f"{issue.user.login} ({issue.user.name})", mass_mentions=True),
                 url=issue.user.html_url,
                 icon_url=issue.user.avatar_url,
             )
@@ -99,25 +99,22 @@ class GitHub(commands.Cog):
             if issue.assignees:
                 embed.add_field(
                     name="Assignees",
-                    value=cf.humanize_list(
-                        [f"[@{x.login}]({x.html_url})" for x in issue.assignees]
+                    value=cf.escape(
+                        cf.humanize_list([f"[@{x.login}]({x.html_url})" for x in issue.assignees]),
+                        mass_mentions=True,
                     ),
                 )
 
             if issue.labels:
                 embed.add_field(
-                    name="Labels", value=cf.humanize_list([x.name for x in issue.labels]),
+                    name="Labels",
+                    value=cf.escape(
+                        cf.humanize_list([x.name for x in issue.labels]), mass_mentions=True
+                    ),
                 )
 
             if issue.milestone:
                 embed.add_field(
-                    name="Milestone",
-                    value=f"[{issue.milestone.title}]({issue.milestone.html_url})",
-                )
-
-            if issue.milestone:
-                embed.add_field(
-                    name="Milestone",
-                    value=f"[{issue.milestone.title}]({issue.milestone.html_url})",
+                    name="Milestone", value=cf.escape(issue.milestone.title, mass_mentions=True),
                 )
             await ctx.send(embed=embed)
