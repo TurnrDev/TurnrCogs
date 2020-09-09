@@ -61,13 +61,13 @@ class GitHub(commands.Cog):
             else:
                 await ctx.send("Access Token is not set!")
 
-    @commands.command(name="issue")
+    @commands.command(name="issue", aliases=["pr"])
     async def issue(self, ctx, issue: int):
         """Can be obtained via https://github.com/settings/tokens"""
         async with ctx.typing():
             __repo = await self.config.repo()
             try:
-                repo = self.github.get_repo(__repo)
+                repo: github.Repository = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]githubset repo`"
@@ -75,27 +75,40 @@ class GitHub(commands.Cog):
                 return
             __issue = issue
             try:
-                issue = repo.get_issue(number=__issue)
+                issue: github.Issue = repo.get_issue(number=__issue)
             except github.GithubException:
-                await ctx.send("Issue not found.")
+                await ctx.send("Issue or Pull Request not found.")
                 return
+            is_pr = True if issue.pull_request is not None else False
+            if is_pr:
+                issue: github.PullRequest = issue.as_pull_request()
+
             embed: discord.Embed = discord.Embed(
                 title=cf.escape(f"{issue.title} (#{issue.number})", mass_mentions=True),
                 description=cf.escape(issue.body, mass_mentions=True),
                 url=issue.html_url,
                 timestamp=issue.updated_at,
-                colour=(
-                    discord.Colour.dark_red()
-                    if issue.state == "closed"
-                    else discord.Colour.green()
-                ),
             )
+            if is_pr and issue.state == "open" and issue.draft:
+                embed.colour = discord.Colour.light_grey()
+            elif is_pr and issue.state == "closed" and issue.merged:
+                embed.colour = discord.Colour.dark_purple()
+            elif issue.state == "closed":
+                embed.colour = discord.Colour.dark_red()
+            else:
+                embed.colour = discord.Colour.green()
+
             embed.set_author(
                 name=cf.escape(f"{issue.user.login} ({issue.user.name})", mass_mentions=True),
                 url=issue.user.html_url,
                 icon_url=issue.user.avatar_url,
             )
-            embed.set_footer(text=str(issue.state).title())
+            footer_text = "{issue_type} • {state}".format(
+                issue_type="PR" if is_pr else "Issue", state=str(issue.state).title()
+            )
+            if is_pr:
+                footer_text += " • {issue.additions}".format(issue=issue)
+            embed.set_footer(text=footer_text)
 
             if issue.assignees:
                 embed.add_field(
