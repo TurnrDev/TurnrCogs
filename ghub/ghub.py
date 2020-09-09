@@ -95,6 +95,7 @@ class GitHub(commands.Cog):
                 url=issue.user.html_url,
                 icon_url=issue.user.avatar_url,
             )
+            embed.set_footer(text=str(issue.state).title())
 
             if issue.assignees:
                 embed.add_field(
