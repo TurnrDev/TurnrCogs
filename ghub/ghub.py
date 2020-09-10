@@ -1,5 +1,6 @@
 import contextlib
 import logging
+import re
 from typing import Optional, Union
 
 import discord
@@ -185,7 +186,7 @@ class GitHub(commands.Cog):
         async with ctx.typing():
             __repo = await self.config.repo()
             try:
-                repo: github.Repository = self.github.get_repo(__repo)
+                repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]ghubset repo`"
@@ -193,19 +194,48 @@ class GitHub(commands.Cog):
                 return
             __issue = issue
             try:
-                issue: github.Issue = repo.get_issue(number=__issue)
+                issue = repo.get_issue(number=__issue)
             except github.GithubException:
                 await ctx.send("Issue or Pull Request not found.")
                 return
             embed = await self.create_issue_embed(repo, issue)
             await ctx.send(embed=embed)
 
+    @commands.Cog.listener("on_message_without_command")
+    async def post_issue(self, message: discord.Message) -> None:
+        if not (await self.bot.message_eligible_as_command(message)):
+            return
+
+        if await self.bot.cog_disabled_in_guild(self, message.guild):
+            return
+
+        __repo = await self.config.repo()
+        if __repo:
+            pattern = r"{repo}#(\d*)".format(repo=__repo.split("/")[1])
+        else:
+            return
+
+        search = re.search(pattern, message.content, re.IGNORECASE)
+        if search:
+            __issue = int(search[1])
+        else:
+            return
+
+        async with message.channel.typing():
+            try:
+                repo = self.github.get_repo(__repo)
+                issue = repo.get_issue(number=__issue)
+            except github.GithubException:
+                return
+            embed = await self.create_issue_embed(repo, issue)
+            await message.channel.send(embed=embed)
+
     @commands.command(name="bug", rest_is_raw=True)
     async def bug(self, ctx, title: str, *, body: str):
         async with ctx.typing():
             __repo = await self.config.repo()
             try:
-                repo: github.Repository = self.github.get_repo(__repo)
+                repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]ghubset repo`"
@@ -234,7 +264,7 @@ class GitHub(commands.Cog):
         async with ctx.typing():
             __repo = await self.config.repo()
             try:
-                repo: github.Repository = self.github.get_repo(__repo)
+                repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]ghubset repo`"
@@ -263,7 +293,7 @@ class GitHub(commands.Cog):
         async with ctx.typing():
             __repo = await self.config.repo()
             try:
-                repo: github.Repository = self.github.get_repo(__repo)
+                repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]ghubset repo`"
