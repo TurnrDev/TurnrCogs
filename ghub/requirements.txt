@@ -1,1 +1,2 @@
 -r ../requirements.txt
+discord-ext-alternatives>=2020.6.16

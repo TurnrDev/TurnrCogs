@@ -5,6 +5,9 @@
   "description": "Create, edit and close your GitHub issues",
   "short": "Create, edit and close your GitHub issues",
   "min_bot_version": "3.4.0",
+  "requirements": [
+    "discord-ext-alternatives>=2020.6.16"
+  ],
   "tags": [
     "GitHub"
   ],
