@@ -202,7 +202,6 @@ class GitHub(commands.Cog):
 
     @commands.command(name="bug", rest_is_raw=True)
     async def bug(self, ctx, title: str, *, body: str):
-        """Can be obtained via https://github.com/settings/tokens"""
         async with ctx.typing():
             __repo = await self.config.repo()
             try:
@@ -229,3 +228,61 @@ class GitHub(commands.Cog):
             issue = repo.create_issue(**__issue)
             embed = await self.create_issue_embed(repo, issue)
             await ctx.send(content="Bug report created", embed=embed)
+
+    @commands.command(name="feature", rest_is_raw=True)
+    async def feature(self, ctx, title: str, *, body: str):
+        async with ctx.typing():
+            __repo = await self.config.repo()
+            try:
+                repo: github.Repository = self.github.get_repo(__repo)
+            except github.GithubException:
+                await ctx.send(
+                    "Repo cannot be found, please check your config with `[p]ghubset repo`"
+                )
+                return
+
+            __issue = {"title": title}
+            __issue["body"] = quote(body)
+            __issue["body"] += (
+                "\n\nFeature [requested]({message.jump_url})"
+                " by *{member}*"
+                " on [{guild.name}]({guild.jump_url})"
+            ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+
+            __label = await self.config.bug_label()
+            with contextlib.suppress(github.GithubException):
+                label = repo.get_label(__label)
+                __issue["labels"] = [label]
+
+            issue = repo.create_issue(**__issue)
+            embed = await self.create_issue_embed(repo, issue)
+            await ctx.send(content="Feature request created", embed=embed)
+
+    @commands.command(name="enhancement", rest_is_raw=True)
+    async def enhancement(self, ctx, title: str, *, body: str):
+        async with ctx.typing():
+            __repo = await self.config.repo()
+            try:
+                repo: github.Repository = self.github.get_repo(__repo)
+            except github.GithubException:
+                await ctx.send(
+                    "Repo cannot be found, please check your config with `[p]ghubset repo`"
+                )
+                return
+
+            __issue = {"title": title}
+            __issue["body"] = quote(body)
+            __issue["body"] += (
+                "\n\nEnhancement [suggested]({message.jump_url})"
+                " by *{member}*"
+                " on [{guild.name}]({guild.jump_url})"
+            ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+
+            __label = await self.config.bug_label()
+            with contextlib.suppress(github.GithubException):
+                label = repo.get_label(__label)
+                __issue["labels"] = [label]
+
+            issue = repo.create_issue(**__issue)
+            embed = await self.create_issue_embed(repo, issue)
+            await ctx.send(content="Enhancement suggestion created", embed=embed)
