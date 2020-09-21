@@ -6,6 +6,11 @@ and this cog adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.0.1] - 2020-09-21
+### Changed
+- Fixed end_user_data_statement
+- Fixed discord-ext-alternatives
+
 ## [1.0.0] - 2020-09-21
 ### Added
 - Add options for setting labels
@@ -15,5 +20,6 @@ and this cog adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Add commands for searching for issues and PRs
 - Add commands for creating issues
 
-[Unreleased]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.0...HEAD
+[Unreleased]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.1...HEAD
+[1.0.1]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.0...issues-v1.0.1
 [1.0.0]: https://github.com/TurnrDev/TurnrCogs/releases/tag/issues-v1.0.0
