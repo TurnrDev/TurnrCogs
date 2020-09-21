@@ -163,7 +163,7 @@ class GitHub(commands.Cog):
 
     @issueset.command(name="token")
     async def issueset__token(self, ctx, access_token: Optional[str] = None):
-        """Change and view the bug label
+        """Change and view the access token
 
         Running a bare naked command with no arguements will return part of the current value.
 
