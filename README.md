@@ -29,4 +29,4 @@ You can contact me on [Twitter](https://www.twitter.com/TurnrDev)
 ---
 | Name | Description |
 | --- | --- |
-| `ghub` | Allows you to manage GitHub issues from your favourite Discord server |
+| `issues` | Allows you to manage GitHub issues from your favourite Discord server |

@@ -1,4 +1,4 @@
-from .ghub import GitHub
+from .issues import GitHub
 
 __version__ = "1.0.0a"
 __author__ = "TurnrDev"
