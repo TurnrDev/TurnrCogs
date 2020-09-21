@@ -12,5 +12,6 @@
   "tags": [
     "GitHub"
   ],
-  "name": "GitHub Issue Manager"
+  "name": "GitHub Issue Manager",
+  "end_user_data_statement": "This cog does not persistently store data about users."
 }
