@@ -6,6 +6,11 @@ and this cog adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.0.2] - 2020-09-22
+### Changed
+- Fixed an issue where the access_token was obfuscated before saving
+- Added logging for not finding resources
+
 ## [1.0.1] - 2020-09-21
 ### Changed
 - Fixed end_user_data_statement
@@ -20,6 +25,7 @@ and this cog adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Add commands for searching for issues and PRs
 - Add commands for creating issues
 
-[Unreleased]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.1...HEAD
+[Unreleased]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.2...HEAD
+[1.0.2]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.1...issues-v1.0.2
 [1.0.1]: https://github.com/TurnrDev/TurnrCogs/compare/issues-v1.0.0...issues-v1.0.1
 [1.0.0]: https://github.com/TurnrDev/TurnrCogs/releases/tag/issues-v1.0.0
