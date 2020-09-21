@@ -53,12 +53,8 @@ class GitHub(commands.Cog):
             repo = await self.config.repo()
             await ctx.send("Repository is `{repo}`".format(repo=repo))
 
-    @ghubset.group(name="bug")
-    async def ghubset__bug(self, ctx):
-        pass
-
-    @ghubset__bug.command(name="label")
-    async def ghubset__bug__label(self, ctx, label: Optional[str] = None):
+    @ghubset.command(name="bug")
+    async def ghubset__bug(self, ctx, label: Optional[str] = None):
         if label:
             await self.config.bug_label.set(label)
             await ctx.send("Bug label has been set to `{label}`".format(label=label))
@@ -66,12 +62,8 @@ class GitHub(commands.Cog):
             label = await self.config.bug_label()
             await ctx.send("Bug label is `{label}`".format(label=label))
 
-    @ghubset.group(name="feature")
-    async def ghubset__feature(self, ctx):
-        pass
-
-    @ghubset__feature.command(name="label")
-    async def ghubset__feature__label(self, ctx, label: Optional[str] = None):
+    @ghubset.command(name="feature")
+    async def ghubset__feature(self, ctx, label: Optional[str] = None):
         if label:
             await self.config.feature_label.set(label)
             await ctx.send("Feature label has been set to `{label}`".format(label=label))
@@ -79,12 +71,8 @@ class GitHub(commands.Cog):
             label = await self.config.feature_label()
             await ctx.send("Feature label is `{label}`".format(label=label))
 
-    @ghubset.group(name="enhancement")
-    async def ghubset__enhancement(self, ctx):
-        pass
-
-    @ghubset__enhancement.command(name="label")
-    async def ghubset__enhancement__label(self, ctx, label: Optional[str] = None):
+    @ghubset.command(name="enhancement")
+    async def ghubset__enhancement(self, ctx, label: Optional[str] = None):
         if label:
             await self.config.enhancement_label.set(label)
             await ctx.send("Enhancement label has been set to `{label}`".format(label=label))
