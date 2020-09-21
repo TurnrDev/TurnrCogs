@@ -29,7 +29,7 @@ class GitHub(commands.Cog):
                 "bug_label": "bug",
                 "feature_label": "enhancement",
                 "enhancement_label": "enhancement",
-                "priority_labels": {1: "low", 2: "medium", 3: "high"},
+                "priority_levels": {"1": "low", "2": "medium", "3": "high"},
                 "priority_default_level": 2,
             }
         )
@@ -87,15 +87,17 @@ class GitHub(commands.Cog):
     async def issueset__priority(
         self, ctx, priority: Optional[int] = None, label: Optional[str] = None
     ):
-        labels = await self.config.priority_labels()
         if label is not None and priority is not None:
-            labels[priority] = label
-            await self.config.priority_labels.set(labels)
+            await self.config.set_raw("priority_levels", str(priority), value=label)
+            labels = await self.config.priority_levels()
+            print(labels)
             await ctx.send(
                 "Priority level {level} set\n".format(level=priority)
                 + cf.box(json.dumps(labels, indent=2, ensure_ascii=False), "json")
             )
         else:
+            labels = await self.config.priority_levels()
+            print(labels)
             await ctx.send(
                 "Priority levels:\n"
                 + cf.box(json.dumps(labels, indent=2, ensure_ascii=False), "json")
@@ -104,7 +106,7 @@ class GitHub(commands.Cog):
     @issueset.command(name="default_priority")
     async def issueset__default_priority(self, ctx, level: Optional[int] = None):
         if level:
-            await self.config.priority_default_level.set(label)
+            await self.config.priority_default_level.set(int(level))
             await ctx.send("Default Priority Level has been set to `{level}`".format(level=level))
         else:
             level = await self.config.priority_default_level()
@@ -202,17 +204,17 @@ class GitHub(commands.Cog):
     async def issue(self, ctx, issue: int):
         """Can be obtained via https://github.com/settings/tokens"""
         async with ctx.typing():
-            __repo = await self.config.repo()
+            repo_name = await self.config.repo()
             try:
-                repo = self.github.get_repo(__repo)
+                repo = self.github.get_repo(repo_name)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
-            __issue = issue
+            issue_number = issue
             try:
-                issue = repo.get_issue(number=__issue)
+                issue = repo.get_issue(number=issue_number)
             except github.GithubException:
                 await ctx.send("Issue or Pull Request not found.")
                 return
@@ -231,110 +233,131 @@ class GitHub(commands.Cog):
         if await self.bot.cog_disabled_in_guild(self, message.guild):
             return
 
-        __repo = await self.config.repo()
-        if __repo:
-            pattern = r"{repo}#(\d*)".format(repo=__repo.split("/")[1])
+        repo_name = await self.config.repo()
+        if repo_name:
+            pattern = r"{repo}#(\d*)".format(repo=repo_name.split("/")[1])
         else:
             return
 
         search = re.search(pattern, message.content, re.IGNORECASE)
         if search:
-            __issue = int(search[1])
+            issue_number = int(search[1])
         else:
             return
 
         async with message.channel.typing():
             try:
-                repo = self.github.get_repo(__repo)
-                issue = repo.get_issue(number=__issue)
+                repo = self.github.get_repo(repo_name)
+                issue = repo.get_issue(number=issue_number)
             except github.GithubException:
                 return
             embed = await self.create_issue_embed(repo, issue)
             await message.channel.send(embed=embed)
 
     @commands.command(name="bug", rest_is_raw=True)
-    async def bug(self, ctx, title: str, *, body: str):
+    async def bug(self, ctx, title: str, priority: Optional[int], *, body: str):
         async with ctx.typing():
-            __repo = await self.config.repo()
+            repo_name = await self.config.repo()
             try:
-                repo = self.github.get_repo(__repo)
+                repo = self.github.get_repo(repo_name)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
 
-            __issue = {"title": title}
-            __issue["body"] = quote(body)
-            __issue["body"] += (
+            issue_dict = {"title": title, "labels": []}
+            issue_dict["body"] = quote(body)
+            issue_dict["body"] += (
                 "\n\nBug [reported]({message.jump_url})"
                 " by *{member}*"
                 " on [{guild.name}]({guild.jump_url})"
             ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
-            __label = await self.config.bug_label()
-            with contextlib.suppress(github.GithubException):
-                label = repo.get_label(__label)
-                __issue["labels"] = [label]
+            if priority is None:
+                priority = await self.config.priority_default_level()
 
-            issue = repo.create_issue(**__issue)
+            priority_label = (await self.config.priority_levels()).get(str(priority), None)
+            if priority_label:
+                with contextlib.suppress(github.GithubException):
+                    issue_dict["labels"].append(repo.get_label(priority_label))
+
+            label_name = await self.config.bug_label()
+            with contextlib.suppress(github.GithubException):
+                issue_dict["labels"].append(repo.get_label(label_name))
+
+            issue = repo.create_issue(**issue_dict)
             embed = await self.create_issue_embed(repo, issue)
             await ctx.send(content="Bug report created", embed=embed)
 
     @commands.command(name="feature", rest_is_raw=True)
-    async def feature(self, ctx, title: str, *, body: str):
+    async def feature(self, ctx, title: str, priority: Optional[int], *, body: str):
         async with ctx.typing():
-            __repo = await self.config.repo()
+            repo_name = await self.config.repo()
             try:
-                repo = self.github.get_repo(__repo)
+                repo = self.github.get_repo(repo_name)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
 
-            __issue = {"title": title}
-            __issue["body"] = quote(body)
-            __issue["body"] += (
+            issue_dict = {"title": title, "labels": []}
+            issue_dict["body"] = quote(body)
+            issue_dict["body"] += (
                 "\n\nFeature [requested]({message.jump_url})"
                 " by *{member}*"
                 " on [{guild.name}]({guild.jump_url})"
             ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
-            __label = await self.config.bug_label()
-            with contextlib.suppress(github.GithubException):
-                label = repo.get_label(__label)
-                __issue["labels"] = [label]
+            if priority is None:
+                priority = await self.config.priority_default_level()
 
-            issue = repo.create_issue(**__issue)
+            priority_label = (await self.config.priority_levels()).get(priority, None)
+            if priority_label:
+                with contextlib.suppress(github.GithubException):
+                    issue_dict["labels"].append(repo.get_label(priority_label))
+
+            label_name = await self.config.feature_label()
+            with contextlib.suppress(github.GithubException):
+                issue_dict["labels"].append(repo.get_label(label_name))
+
+            issue = repo.create_issue(**issue_dict)
             embed = await self.create_issue_embed(repo, issue)
             await ctx.send(content="Feature request created", embed=embed)
 
     @commands.command(name="enhancement", rest_is_raw=True)
-    async def enhancement(self, ctx, title: str, *, body: str):
+    async def enhancement(self, ctx, title: str, priority: Optional[int], *, body: str):
         async with ctx.typing():
-            __repo = await self.config.repo()
+            repo_name = await self.config.repo()
             try:
-                repo = self.github.get_repo(__repo)
+                repo = self.github.get_repo(repo_name)
             except github.GithubException:
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
 
-            __issue = {"title": title}
-            __issue["body"] = quote(body)
-            __issue["body"] += (
+            issue_dict = {"title": title, "labels": []}
+            issue_dict["body"] = quote(body)
+            issue_dict["body"] += (
                 "\n\nEnhancement [suggested]({message.jump_url})"
                 " by *{member}*"
                 " on [{guild.name}]({guild.jump_url})"
             ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
-            __label = await self.config.bug_label()
-            with contextlib.suppress(github.GithubException):
-                label = repo.get_label(__label)
-                __issue["labels"] = [label]
+            if priority is None:
+                priority = await self.config.priority_default_level()
 
-            issue = repo.create_issue(**__issue)
+            priority_label = (await self.config.priority_levels()).get(priority, None)
+            if priority_label:
+                with contextlib.suppress(github.GithubException):
+                    issue_dict["labels"].append(repo.get_label(priority_label))
+
+            label_name = await self.config.enhancement_label()
+            with contextlib.suppress(github.GithubException):
+                issue_dict["labels"].append(repo.get_label(label_name))
+
+            issue = repo.create_issue(**issue_dict)
             embed = await self.create_issue_embed(repo, issue)
             await ctx.send(content="Enhancement suggestion created", embed=embed)
