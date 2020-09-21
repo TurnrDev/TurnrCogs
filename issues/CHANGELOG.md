@@ -6,7 +6,7 @@ and this cog adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [0.0.1] - 2020-09-21
+## [1.0.0] - 2020-09-21
 ### Added
 - Add options for setting labels
 - Add options for setting default level
