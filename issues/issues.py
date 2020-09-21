@@ -6,7 +6,11 @@ from typing import Optional, Union
 
 import discord
 import github
-from discord.ext.alternatives import jump_url
+
+try:
+    from discord.ext.alternatives import jump_url
+except ModuleNotFoundError:
+    jump_url = None
 from redbot.core import Config, commands
 from redbot.core.utils import chat_formatting as cf
 
@@ -42,6 +46,9 @@ class GitHub(commands.Cog):
         if not access_token:
             log.warning("No valid access_token found")
         self.github = github.Github(access_token)
+
+    async def red_delete_data_for_user(*args, **kwargs):
+        pass
 
     @commands.group(name="issueset")
     async def issueset(self, ctx):
@@ -322,11 +329,16 @@ class GitHub(commands.Cog):
 
             issue_dict = {"title": title, "labels": []}
             issue_dict["body"] = quote(body)
-            issue_dict["body"] += (
-                "\n\nBug [reported]({message.jump_url})"
-                " by *{member}*"
-                " on [{guild.name}]({guild.jump_url})"
-            ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+            if jump_url:
+                issue_dict["body"] += (
+                    "\n\nBug [reported]({message.jump_url})"
+                    " by *{member}*"
+                    " on [{guild.name}]({guild.jump_url})"
+                ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+            else:
+                issue_dict["body"] += (
+                    "\n\nBug [reported]({message.jump_url}) by *{member}* on {guild.name}"
+                ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
             if priority is None:
                 priority = await self.config.priority_default_level()
@@ -365,11 +377,18 @@ class GitHub(commands.Cog):
 
             issue_dict = {"title": title, "labels": []}
             issue_dict["body"] = quote(body)
-            issue_dict["body"] += (
-                "\n\nFeature [requested]({message.jump_url})"
-                " by *{member}*"
-                " on [{guild.name}]({guild.jump_url})"
-            ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+            if jump_url:
+                issue_dict["body"] += (
+                    "\n\nFeature [requested]({message.jump_url})"
+                    " by *{member}*"
+                    " on [{guild.name}]({guild.jump_url})"
+                ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+            else:
+                issue_dict["body"] += (
+                    "\n\nFeature [requested]({message.jump_url})"
+                    " by *{member}*"
+                    " on {guild.name}"
+                ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
             if priority is None:
                 priority = await self.config.priority_default_level()
@@ -408,11 +427,18 @@ class GitHub(commands.Cog):
 
             issue_dict = {"title": title, "labels": []}
             issue_dict["body"] = quote(body)
-            issue_dict["body"] += (
-                "\n\nEnhancement [suggested]({message.jump_url})"
-                " by *{member}*"
-                " on [{guild.name}]({guild.jump_url})"
-            ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+            if jump_url:
+                issue_dict["body"] += (
+                    "\n\nEnhancement [suggested]({message.jump_url})"
+                    " by *{member}*"
+                    " on [{guild.name}]({guild.jump_url})"
+                ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
+            else:
+                issue_dict["body"] += (
+                    "\n\nEnhancement [suggested]({message.jump_url})"
+                    " by *{member}*"
+                    " on {guild.name}"
+                ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
             if priority is None:
                 priority = await self.config.priority_default_level()
