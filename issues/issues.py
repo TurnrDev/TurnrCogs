@@ -1,4 +1,5 @@
 import contextlib
+import json
 import logging
 import re
 from typing import Optional, Union
@@ -28,6 +29,8 @@ class GitHub(commands.Cog):
                 "bug_label": "bug",
                 "feature_label": "enhancement",
                 "enhancement_label": "enhancement",
+                "priority_labels": {1: "low", 2: "medium", 3: "high"},
+                "priority_default_level": 2,
             }
         )
         self.github: github.Github = None
@@ -79,6 +82,33 @@ class GitHub(commands.Cog):
         else:
             label = await self.config.enhancement_label()
             await ctx.send("Enhancement label is `{label}`".format(label=label))
+
+    @ghubset.command(name="priority")
+    async def ghubset__priority(
+        self, ctx, priority: Optional[int] = None, label: Optional[str] = None
+    ):
+        labels = await self.config.priority_labels()
+        if label is not None and priority is not None:
+            labels[priority] = label
+            await self.config.priority_labels.set(labels)
+            await ctx.send(
+                "Priority level {level} set\n".format(level=priority)
+                + cf.box(json.dumps(labels, indent=2, ensure_ascii=False), "json")
+            )
+        else:
+            await ctx.send(
+                "Priority levels:\n"
+                + cf.box(json.dumps(labels, indent=2, ensure_ascii=False), "json")
+            )
+
+    @ghubset.command(name="default_priority")
+    async def ghubset__default_priority(self, ctx, level: Optional[int] = None):
+        if level:
+            await self.config.priority_default_level.set(label)
+            await ctx.send("Default Priority Level has been set to `{level}`".format(level=level))
+        else:
+            level = await self.config.priority_default_level()
+            await ctx.send("Default Priority Level is `{level}`".format(level=level))
 
     @ghubset.command(name="token")
     async def ghubset__token(self, ctx, access_token: Optional[str] = None):
