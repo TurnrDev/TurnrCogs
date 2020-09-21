@@ -43,6 +43,9 @@ class GitHub(commands.Cog):
             log.warning("No valid access_token found")
         self.github = github.Github(access_token)
 
+    async def red_delete_data_for_user(*args, **kwargs):
+        pass
+
     @commands.group(name="issueset")
     async def issueset(self, ctx):
         """Change and view settings for this cog.
