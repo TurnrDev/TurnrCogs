@@ -43,12 +43,12 @@ class GitHub(commands.Cog):
             log.warning("No valid access_token found")
         self.github = github.Github(access_token)
 
-    @commands.group(name="ghubset")
-    async def ghubset(self, ctx):
+    @commands.group(name="issueset")
+    async def issueset(self, ctx):
         pass
 
-    @ghubset.command(name="repo")
-    async def ghubset__repo(self, ctx, repo: Optional[str] = None):
+    @issueset.command(name="repo")
+    async def issueset__repo(self, ctx, repo: Optional[str] = None):
         if repo:
             await self.config.repo.set(repo)
             await ctx.send("Repository has been set to `{repo}`".format(repo=repo))
@@ -56,8 +56,8 @@ class GitHub(commands.Cog):
             repo = await self.config.repo()
             await ctx.send("Repository is `{repo}`".format(repo=repo))
 
-    @ghubset.command(name="bug")
-    async def ghubset__bug(self, ctx, label: Optional[str] = None):
+    @issueset.command(name="bug")
+    async def issueset__bug(self, ctx, label: Optional[str] = None):
         if label:
             await self.config.bug_label.set(label)
             await ctx.send("Bug label has been set to `{label}`".format(label=label))
@@ -65,8 +65,8 @@ class GitHub(commands.Cog):
             label = await self.config.bug_label()
             await ctx.send("Bug label is `{label}`".format(label=label))
 
-    @ghubset.command(name="feature")
-    async def ghubset__feature(self, ctx, label: Optional[str] = None):
+    @issueset.command(name="feature")
+    async def issueset__feature(self, ctx, label: Optional[str] = None):
         if label:
             await self.config.feature_label.set(label)
             await ctx.send("Feature label has been set to `{label}`".format(label=label))
@@ -74,8 +74,8 @@ class GitHub(commands.Cog):
             label = await self.config.feature_label()
             await ctx.send("Feature label is `{label}`".format(label=label))
 
-    @ghubset.command(name="enhancement")
-    async def ghubset__enhancement(self, ctx, label: Optional[str] = None):
+    @issueset.command(name="enhancement")
+    async def issueset__enhancement(self, ctx, label: Optional[str] = None):
         if label:
             await self.config.enhancement_label.set(label)
             await ctx.send("Enhancement label has been set to `{label}`".format(label=label))
@@ -83,8 +83,8 @@ class GitHub(commands.Cog):
             label = await self.config.enhancement_label()
             await ctx.send("Enhancement label is `{label}`".format(label=label))
 
-    @ghubset.command(name="priority")
-    async def ghubset__priority(
+    @issueset.command(name="priority")
+    async def issueset__priority(
         self, ctx, priority: Optional[int] = None, label: Optional[str] = None
     ):
         labels = await self.config.priority_labels()
@@ -101,8 +101,8 @@ class GitHub(commands.Cog):
                 + cf.box(json.dumps(labels, indent=2, ensure_ascii=False), "json")
             )
 
-    @ghubset.command(name="default_priority")
-    async def ghubset__default_priority(self, ctx, level: Optional[int] = None):
+    @issueset.command(name="default_priority")
+    async def issueset__default_priority(self, ctx, level: Optional[int] = None):
         if level:
             await self.config.priority_default_level.set(label)
             await ctx.send("Default Priority Level has been set to `{level}`".format(level=level))
@@ -110,8 +110,8 @@ class GitHub(commands.Cog):
             level = await self.config.priority_default_level()
             await ctx.send("Default Priority Level is `{level}`".format(level=level))
 
-    @ghubset.command(name="token")
-    async def ghubset__token(self, ctx, access_token: Optional[str] = None):
+    @issueset.command(name="token")
+    async def issueset__token(self, ctx, access_token: Optional[str] = None):
         """Can be obtained via https://github.com/settings/tokens"""
 
         def last_four(t: str) -> str:
@@ -207,7 +207,7 @@ class GitHub(commands.Cog):
                 repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
-                    "Repo cannot be found, please check your config with `[p]ghubset repo`"
+                    "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
             __issue = issue
@@ -256,7 +256,7 @@ class GitHub(commands.Cog):
                 repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
-                    "Repo cannot be found, please check your config with `[p]ghubset repo`"
+                    "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
 
@@ -285,7 +285,7 @@ class GitHub(commands.Cog):
                 repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
-                    "Repo cannot be found, please check your config with `[p]ghubset repo`"
+                    "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
 
@@ -314,7 +314,7 @@ class GitHub(commands.Cog):
                 repo = self.github.get_repo(__repo)
             except github.GithubException:
                 await ctx.send(
-                    "Repo cannot be found, please check your config with `[p]ghubset repo`"
+                    "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
                 return
 
