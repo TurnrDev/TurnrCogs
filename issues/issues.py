@@ -45,10 +45,22 @@ class GitHub(commands.Cog):
 
     @commands.group(name="issueset")
     async def issueset(self, ctx):
+        """Change and view settings for this cog.
+
+        Running a bare naked command with no arguements will return the current value
+        """
         pass
 
     @issueset.command(name="repo")
     async def issueset__repo(self, ctx, repo: Optional[str] = None):
+        """Change and view the repo setting
+
+        Running a bare naked command with no arguements will return the current value.
+
+        Expected format: `{user}/{repo}`
+        If the GitHub URL is https://github.com/TurnrDev/TurnrCogs,
+        the value would be TurnrDev/TurnrCogs
+        """
         if repo:
             await self.config.repo.set(repo)
             await ctx.send("Repository has been set to `{repo}`".format(repo=repo))
@@ -58,6 +70,12 @@ class GitHub(commands.Cog):
 
     @issueset.command(name="bug")
     async def issueset__bug(self, ctx, label: Optional[str] = None):
+        """Change and view the bug label
+
+        Running a bare naked command with no arguements will return the current value.
+
+        Expected format: string
+        """
         if label:
             await self.config.bug_label.set(label)
             await ctx.send("Bug label has been set to `{label}`".format(label=label))
@@ -67,6 +85,12 @@ class GitHub(commands.Cog):
 
     @issueset.command(name="feature")
     async def issueset__feature(self, ctx, label: Optional[str] = None):
+        """Change and view the feature label
+
+        Running a bare naked command with no arguements will return the current value.
+
+        Expected format: string
+        """
         if label:
             await self.config.feature_label.set(label)
             await ctx.send("Feature label has been set to `{label}`".format(label=label))
@@ -76,6 +100,12 @@ class GitHub(commands.Cog):
 
     @issueset.command(name="enhancement")
     async def issueset__enhancement(self, ctx, label: Optional[str] = None):
+        """Change and view the enhancement label
+
+        Running a bare naked command with no arguements will return the current value.
+
+        Expected format: string
+        """
         if label:
             await self.config.enhancement_label.set(label)
             await ctx.send("Enhancement label has been set to `{label}`".format(label=label))
@@ -87,6 +117,12 @@ class GitHub(commands.Cog):
     async def issueset__priority(
         self, ctx, priority: Optional[int] = None, label: Optional[str] = None
     ):
+        """Change and view the priority levels
+
+        Running a bare naked command with no arguements will return the current value.
+
+        Expected format: int string
+        """
         if label is not None and priority is not None:
             await self.config.set_raw("priority_levels", str(priority), value=label)
             labels = await self.config.priority_levels()
@@ -105,6 +141,12 @@ class GitHub(commands.Cog):
 
     @issueset.command(name="default_priority")
     async def issueset__default_priority(self, ctx, level: Optional[int] = None):
+        """Change and view the default priority level
+
+        Running a bare naked command with no arguements will return the current value.
+
+        Expected format: int
+        """
         if level:
             await self.config.priority_default_level.set(int(level))
             await ctx.send("Default Priority Level has been set to `{level}`".format(level=level))
@@ -114,7 +156,12 @@ class GitHub(commands.Cog):
 
     @issueset.command(name="token")
     async def issueset__token(self, ctx, access_token: Optional[str] = None):
-        """Can be obtained via https://github.com/settings/tokens"""
+        """Change and view the bug label
+
+        Running a bare naked command with no arguements will return part of the current value.
+
+        Can be obtained via https://github.com/settings/tokens
+        """
 
         def last_four(t: str) -> str:
             return ("*" * len(t[:-4])) + t[-4:]
@@ -202,7 +249,7 @@ class GitHub(commands.Cog):
 
     @commands.command(name="issue", aliases=["pr"])
     async def issue(self, ctx, issue: int):
-        """Can be obtained via https://github.com/settings/tokens"""
+        """View a GitHub issue or PR from the configured repo"""
         async with ctx.typing():
             repo_name = await self.config.repo()
             try:
@@ -256,6 +303,13 @@ class GitHub(commands.Cog):
 
     @commands.command(name="bug", rest_is_raw=True)
     async def bug(self, ctx, title: str, priority: Optional[int], *, body: str):
+        """Create a bug report
+
+        Expects the following three parameters in this order:
+        title: quoted-str (This needs to be quoted if you want more than one word.)
+        priority: Optional[int]
+        body: str
+        """
         async with ctx.typing():
             repo_name = await self.config.repo()
             try:
@@ -292,6 +346,13 @@ class GitHub(commands.Cog):
 
     @commands.command(name="feature", rest_is_raw=True)
     async def feature(self, ctx, title: str, priority: Optional[int], *, body: str):
+        """Create a feature request
+
+        Expects the following three parameters in this order:
+        title: quoted-str (This needs to be quoted if you want more than one word.)
+        priority: Optional[int]
+        body: str
+        """
         async with ctx.typing():
             repo_name = await self.config.repo()
             try:
@@ -328,6 +389,13 @@ class GitHub(commands.Cog):
 
     @commands.command(name="enhancement", rest_is_raw=True)
     async def enhancement(self, ctx, title: str, priority: Optional[int], *, body: str):
+        """Create a enhancement suggestion
+
+        Expects the following three parameters in this order:
+        title: quoted-str (This needs to be quoted if you want more than one word.)
+        priority: Optional[int]
+        body: str
+        """
         async with ctx.typing():
             repo_name = await self.config.repo()
             try:
