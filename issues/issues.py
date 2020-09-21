@@ -337,7 +337,7 @@ class GitHub(commands.Cog):
                 ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
             else:
                 issue_dict["body"] += (
-                    "\n\nBug [reported]({message.jump_url})" " by *{member}*" " on {guild.name}"
+                    "\n\nBug [reported]({message.jump_url}) by *{member}* on {guild.name}"
                 ).format(message=ctx.message, member=ctx.author, guild=ctx.guild)
 
             if priority is None:
