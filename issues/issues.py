@@ -220,7 +220,11 @@ class GitHub(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.Cog.listener("on_message_without_command")
-    async def post_issue(self, message: discord.Message) -> None:
+    async def find_issue_from_message(self, message: discord.Message) -> None:
+        """If the repo name is posted with what looks like an issue number on the end, find issue.
+
+        Fails silently
+        """
         if not (await self.bot.message_eligible_as_command(message)):
             return
 
