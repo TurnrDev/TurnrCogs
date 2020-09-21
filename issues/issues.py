@@ -174,19 +174,19 @@ class GitHub(commands.Cog):
             return ("*" * len(t[:-4])) + t[-4:]
 
         if access_token:
-            await self.bot.set_shared_api_tokens("github", access_token=last_four(access_token))
+            await self.bot.set_shared_api_tokens("github", access_token=access_token)
             await ctx.send(
-                "Access Token has been set to `{access_token}`".format(
-                    access_token="*" * len(access_token)
-                )
+                "Access Token has been set to `{token}`".format(token=last_four(access_token))
             )
         else:
             api_tokens = await self.bot.get_shared_api_tokens("github")
-            token = api_tokens.get("access_token")
-            if token:
-                await ctx.send("Access Token is `{token}`".format(token=last_four(token)))
+            access_token = api_tokens.get("access_token")
+            if access_token:
+                await ctx.send("Access Token is `{token}`".format(token=last_four(access_token)))
             else:
                 await ctx.send("Access Token is not set!")
+
+        await self.create_client()
 
     async def create_issue_embed(
         self,
