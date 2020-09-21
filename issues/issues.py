@@ -265,12 +265,16 @@ class GitHub(commands.Cog):
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
+                await ctx.send("https://github.com/{}".format(repo_name))
+                log.exception("Assumed repo cannot be found")
                 return
             issue_number = issue
             try:
                 issue = repo.get_issue(number=issue_number)
             except github.GithubException:
                 await ctx.send("Issue or Pull Request not found.")
+                await ctx.send("https://github.com/{}/issues/{}".format(repo_name, issue_number))
+                log.exception("Assumed issue cannot be found")
                 return
             embed = await self.create_issue_embed(repo, issue)
             await ctx.send(embed=embed)
@@ -304,6 +308,7 @@ class GitHub(commands.Cog):
                 repo = self.github.get_repo(repo_name)
                 issue = repo.get_issue(number=issue_number)
             except github.GithubException:
+                log.exception("Assumed issue cannot be found")
                 return
             embed = await self.create_issue_embed(repo, issue)
             await message.channel.send(embed=embed)
@@ -325,6 +330,7 @@ class GitHub(commands.Cog):
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
+                await ctx.send("https://github.com/{}".format(repo_name))
                 return
 
             issue_dict = {"title": title, "labels": []}
@@ -373,6 +379,8 @@ class GitHub(commands.Cog):
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
+                await ctx.send("https://github.com/{}".format(repo_name))
+                log.exception("Assumed repo cannot be found")
                 return
 
             issue_dict = {"title": title, "labels": []}
@@ -423,6 +431,8 @@ class GitHub(commands.Cog):
                 await ctx.send(
                     "Repo cannot be found, please check your config with `[p]issueset repo`"
                 )
+                await ctx.send("https://github.com/{}".format(repo_name))
+                log.exception("Assumed repo cannot be found")
                 return
 
             issue_dict = {"title": title, "labels": []}
